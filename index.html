@@ -350,8 +350,8 @@ const CONTENT = {
           title: "Digital Audit Form",
           note:  "Complete once per month for each property. Due by the last day of the month.",
           items: [
-            // ⬇ Swap "#" with your Microsoft Forms embed URL once built
-            { label: "Open the Digital Audit Form", type: "msform", url: "#" },
+            { label: "Open the Digital Audit Form", type: "msform", url: "https://form.jotform.com/260945796162064" },
+            { label: "Open form in a new tab", type: "file", url: "https://form.jotform.com/260945796162064" },
           ],
         },
         {
@@ -977,15 +977,39 @@ function openT(btn){
   if(!item)return;
   document.getElementById('modalTtl').textContent=item.label;
   const bd=document.getElementById('modalBd');
-  bd.innerHTML='<div class="modal-loading" id="mLoad"><div class="modal-spinner"></div><p>Loading...</p></div>'
-    +'<iframe src="'+item.url+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="opacity:0;position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>';
-  const iframe=bd.querySelector('iframe');
-  iframe.addEventListener('load',function(){
-    iframe.style.opacity='1';
-    iframe.style.position='relative';
-    const loader=document.getElementById('mLoad');
-    if(loader)loader.remove();
-  });
+  const isJotform = item.url && item.url.includes('jotform.com');
+  if(isJotform){
+    const iframeId = 'JotFormIFrame-lindy-audit';
+    bd.innerHTML='<div class="modal-loading" id="mLoad"><div class="modal-spinner"></div><p>Loading form...</p></div>'
+      +'<iframe id="'+iframeId+'" src="'+item.url+'" allow="geolocation; microphone; camera; fullscreen; payment" allowtransparency="true" frameborder="0" scrolling="no" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;border:none;min-width:100%"></iframe>';
+    const iframe = bd.querySelector('iframe');
+    iframe.addEventListener('load', function(){
+      iframe.style.opacity='1';
+      iframe.style.position='relative';
+      const loader=document.getElementById('mLoad');
+      if(loader)loader.remove();
+      // inject jotform resize handler
+      if(!document.getElementById('jf-embed-script')){
+        const s=document.createElement('script');
+        s.id='jf-embed-script';
+        s.src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js';
+        s.onload=function(){ if(window.jotformEmbedHandler) window.jotformEmbedHandler("iframe[id='"+iframeId+"']","https://form.jotform.com/"); };
+        document.body.appendChild(s);
+      } else if(window.jotformEmbedHandler){
+        window.jotformEmbedHandler("iframe[id='"+iframeId+"']","https://form.jotform.com/");
+      }
+    });
+  } else {
+    bd.innerHTML='<div class="modal-loading" id="mLoad"><div class="modal-spinner"></div><p>Loading...</p></div>'
+      +'<iframe src="'+item.url+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="opacity:0;position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>';
+    const iframe=bd.querySelector('iframe');
+    iframe.addEventListener('load',function(){
+      iframe.style.opacity='1';
+      iframe.style.position='relative';
+      const loader=document.getElementById('mLoad');
+      if(loader)loader.remove();
+    });
+  }
   document.getElementById('modalOv').classList.add('open');
   document.body.style.overflow='hidden';
 }
