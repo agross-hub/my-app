@@ -350,8 +350,8 @@ const CONTENT = {
           title: "Digital Audit Form",
           note:  "Complete once per month for each property. Due by the last day of the month.",
           items: [
-            { label: "Open the Digital Audit Form", type: "msform", url: "https://form.jotform.com/260945796162064" },
-            { label: "Open form in a new tab", type: "file", url: "https://form.jotform.com/260945796162064" },
+            { label: "Open the Digital Audit Form", type: "msform", url: "https://form.jotform.com/260946819364065" },
+            { label: "Open form in a new tab", type: "file", url: "https://form.jotform.com/260946819364065" },
           ],
         },
         {
@@ -771,7 +771,7 @@ function tutRow(item, key){
   } else if(item.type==='walkthrough'){
     btn = `<button class="topen" onclick="openWalkthrough('${item.key}')">Open →</button>`;
   } else if(item.type==='file' && item.url && item.url!=='#'){
-    btn = `<a class="topen" href="${item.url}" target="_blank" rel="noopener" style="text-decoration:none">Download →</a>`;
+    btn = `<a class="topen" href="${item.url}" target="_blank" rel="noopener" style="text-decoration:none">Open →</a>`;
   } else if(item.url){
     btn = `<button class="topen" data-k="${key}" onclick="openT(this)">Open →</button>`;
   } else {
@@ -979,24 +979,32 @@ function openT(btn){
   const bd=document.getElementById('modalBd');
   const isJotform = item.url && item.url.includes('jotform.com');
   if(isJotform){
-    const iframeId = 'JotFormIFrame-lindy-audit';
+    const iframeId = 'JotFormIFrame-260946819364065';
     bd.innerHTML='<div class="modal-loading" id="mLoad"><div class="modal-spinner"></div><p>Loading form...</p></div>'
-      +'<iframe id="'+iframeId+'" src="'+item.url+'" allow="geolocation; microphone; camera; fullscreen; payment" allowtransparency="true" frameborder="0" scrolling="no" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;border:none;min-width:100%"></iframe>';
+      +'<iframe id="'+iframeId+'" title="Lindy Communities Digital Audit"'
+      +' onload="window.parent.scrollTo(0,0)"'
+      +' allowtransparency="true"'
+      +' allow="geolocation; microphone; camera; fullscreen; payment"'
+      +' src="'+item.url+'"'
+      +' frameborder="0"'
+      +' style="opacity:0;min-width:100%;max-width:100%;width:100%;height:100%;border:none;display:block;flex:1"'
+      +' scrolling="yes"></iframe>';
     const iframe = bd.querySelector('iframe');
     iframe.addEventListener('load', function(){
       iframe.style.opacity='1';
-      iframe.style.position='relative';
       const loader=document.getElementById('mLoad');
       if(loader)loader.remove();
-      // inject jotform resize handler
       if(!document.getElementById('jf-embed-script')){
         const s=document.createElement('script');
         s.id='jf-embed-script';
         s.src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js';
-        s.onload=function(){ if(window.jotformEmbedHandler) window.jotformEmbedHandler("iframe[id='"+iframeId+"']","https://form.jotform.com/"); };
+        s.onload=function(){
+          if(window.jotformEmbedHandler)
+            window.jotformEmbedHandler("iframe[id='JotFormIFrame-260946819364065']","https://form.jotform.com/");
+        };
         document.body.appendChild(s);
       } else if(window.jotformEmbedHandler){
-        window.jotformEmbedHandler("iframe[id='"+iframeId+"']","https://form.jotform.com/");
+        window.jotformEmbedHandler("iframe[id='JotFormIFrame-260946819364065']","https://form.jotform.com/");
       }
     });
   } else {
